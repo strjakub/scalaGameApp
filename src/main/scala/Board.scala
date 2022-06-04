@@ -3,13 +3,13 @@ import javafx.scene.input.KeyCode
 import scala.collection.mutable
 
 
-class Board {
+class Board(engine: Engine) {
   var board:mutable.HashMap[Vector, Pawn] = new mutable.HashMap()
 
   def prepare(): Unit = {
     for(i <- 0  to 7){
       val pawn1 = Pawn(Vector(0, i), 1)
-      val pawn2 = Pawn(Vector(7, i), 2)
+      val pawn2 = Pawn(Vector(7, i), -1)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
@@ -19,17 +19,24 @@ class Board {
     board.get(vector)
   }
 
-  def makePawnMove(vector: Vector, command: KeyCode): Unit ={
+  def makePawnMove(vector: Vector, command: KeyCode): Unit =  {
     val pawn : Pawn = board.remove(vector) match {
       case Some(value: Pawn) => value
       case _ => Pawn(Vector(-1,-1), 0)
     }
+    val memoryX = pawn.position.x
+    val memoryY = pawn.position.y
+
     command match {
       case KeyCode.UP => checkJumps(pawn, 'x', -1)
       case KeyCode.DOWN => checkJumps(pawn, 'x', 1)
       case KeyCode.RIGHT => checkJumps(pawn, 'y', 1)
       case KeyCode.LEFT => checkJumps(pawn, 'y', -1)
       case _ =>
+    }
+
+    if(memoryX != pawn.position.x || memoryY != pawn.position.y) {
+      engine.move()
     }
     board.put(pawn.position, pawn)
   }

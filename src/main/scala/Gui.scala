@@ -7,16 +7,20 @@ import scalafx.scene.paint.Color.{Black, Blue, Red, White, Yellow}
 import scalafx.scene.shape.Rectangle
 
 object Gui extends JFXApp3{
-  var board: Board = new Board
+  val engine = new Engine()
+  var board: Board = new Board(engine)
   board.prepare()
   var vector: Vector = Vector(-1,-1)
   var grid: GridPane = new GridPane()
   var size: Int = 500
-  var teamId: Int = 1
+  var teamId: Int = -1
 
   def notify_(): Unit = {
     Platform.runLater{
-      grid = paint(grid)
+      if(teamId == 3)
+        teamId = -5
+      teamId = teamId + 2
+      grid = paint()
     }
   }
 
@@ -28,7 +32,7 @@ object Gui extends JFXApp3{
     fill = color
   }
 
-  def paint(grid: GridPane): GridPane = {
+  def paint(): GridPane = {
     for{i <- 0 until 8}{
       for{j <- 0 until 8}{
         if(i == vector.x && j ==vector.y)
@@ -42,11 +46,14 @@ object Gui extends JFXApp3{
           val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16))
           pawn.id match{
             case 1 => circle.setFill(Blue)
-            case 2 => circle.setFill(Yellow)
+            case -1 => circle.setFill(Yellow)
           }
-          circle.setOnMouseClicked(event => {
-            vector = Vector(i, j)
-          })
+          if(pawn.id * teamId > 0) {
+            circle.setOnMouseClicked(_ => {
+              vector = Vector(i, j)
+              grid = paint()
+            })
+          }
           grid.add(circle, j, i)
         }
       }
@@ -56,14 +63,13 @@ object Gui extends JFXApp3{
 
   override def start(): Unit = {
     size = size - size%8
-    val engine = new Engine()
     val thread = new Thread(engine)
     thread.start()
     for{i <- 0 until 8}{
       grid.addRow(i)
       grid.addColumn(i)
     }
-    grid = paint(grid)
+    grid = paint()
     stage = new JFXApp3.PrimaryStage{
       scene = new Scene(size, size){
         content = grid
