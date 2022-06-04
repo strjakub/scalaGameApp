@@ -1,4 +1,4 @@
-import javafx.scene.input.{KeyCode, KeyEvent}
+import javafx.scene.input.KeyEvent
 import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
@@ -7,8 +7,8 @@ import scalafx.scene.paint.Color.{Black, Blue, Red, White, Yellow}
 import scalafx.scene.shape.Rectangle
 
 object Gui extends JFXApp3{
-  var tab: Array[Array[Int]] = Array(Array(1,1,1,1,1,1,1,1), Array(1,1,1,1,1,1,1,1), Array(0,0,0,0,0,0,0,0), Array(0,0,0,0,0,0,0,0),
-    Array(0,0,0,0,0,0,0,0), Array(0,0,0,0,0,0,0,0), Array(2,2,2,2,2,2,2,2), Array(2,2,2,2,2,2,2,2))
+  var board: Board = new Board
+  board.prepare()
   var vector: Vector = Vector(-1,-1)
   var grid: GridPane = new GridPane()
   var size: Int = 500
@@ -37,15 +37,13 @@ object Gui extends JFXApp3{
           grid.add(rect(size/8*i, size/8*j, Black), j, i)
         else
           grid.add(rect(size/8*i, size/8*j, White), j, i)
-        if(tab(i)(j) == 1) {
-          val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16, Blue))
-          circle.setOnMouseClicked(event => {
-            vector = Vector(i, j)
-          })
-          grid.add(circle, j, i)
-        }
-        if(tab(i)(j) == 2) {
-          val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16, Yellow))
+        if(board.getPawnAt(Vector(i, j)).isDefined) {
+          val pawn = board.getPawnAt(Vector(i, j)).getOrElse(Pawn(Vector(-1,-1),0))
+          val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16))
+          pawn.id match{
+            case 1 => circle.setFill(Blue)
+            case 2 => circle.setFill(Yellow)
+          }
           circle.setOnMouseClicked(event => {
             vector = Vector(i, j)
           })
@@ -70,13 +68,7 @@ object Gui extends JFXApp3{
       scene = new Scene(size, size){
         content = grid
         onKeyPressed = (ke: KeyEvent) => {
-          ke.getCode match {
-            case KeyCode.UP => //tab.pawnAt(vector).move(UP)
-            case KeyCode.DOWN => //tab.pawnAt(vector).move(DOWN)
-            case KeyCode.RIGHT => //tab.pawnAt(vector).move(RIGHT)
-            case KeyCode.LEFT => //tab.pawnAt(vector).move(LEFT)
-            case _ =>
-          }
+          board.makePawnMove(vector, ke.getCode)
           vector = Vector(-1, -1)
         }
       }

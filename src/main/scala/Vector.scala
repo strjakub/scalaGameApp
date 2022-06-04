@@ -1,1 +1,1 @@
-case class Vector(x: Int, y:Int)
+case class Vector(var x: Int,var y:Int)
