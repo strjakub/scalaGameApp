@@ -8,8 +8,8 @@ class Board(engine: Engine) {
 
   def prepare(): Unit = {
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(0, i), 1)
-      val pawn2 = Pawn(Vector(7, i), -1)
+      val pawn1 = Pawn(Vector(0, i), 1, jumped=false)
+      val pawn2 = Pawn(Vector(7, i), -1, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
@@ -22,7 +22,7 @@ class Board(engine: Engine) {
   def makePawnMove(vector: Vector, command: KeyCode): Unit =  {
     val pawn : Pawn = board.remove(vector) match {
       case Some(value: Pawn) => value
-      case _ => Pawn(Vector(-1,-1), 0)
+      case _ => Pawn(Vector(-1,-1), 0, jumped=false)
     }
     val memoryX = pawn.position.x
     val memoryY = pawn.position.y
@@ -37,30 +37,46 @@ class Board(engine: Engine) {
 
     if(memoryX != pawn.position.x || memoryY != pawn.position.y) {
       engine.move()
+    }else{
+      Gui.notify_nothing()
     }
     board.put(pawn.position, pawn)
   }
 
 
-  def outOfMapValidationMove(pawn: Pawn, axis: Char, value: Int): Unit ={
+  def outOfMapValidationMove(pawn: Pawn, axis: Char, value: Int): Boolean ={
     axis match{
       case 'x' => if (7 >= pawn.position.x + value && pawn.position.x + value >= 0){
         pawn.position.x += value
+        pawn.jumped = false
+        return true
       }
       case 'y' => if (7 >= pawn.position.y + value && pawn.position.y + value >= 0){
         pawn.position.y += value
+        pawn.jumped = false
+        return true
       }
     }
+    false
   }
 
   def checkJumps(pawn: Pawn, axis: Char, value: Int): Unit ={
     val oldVector = Vector(pawn.position.x, pawn.position.y)
+    var jumped = false
     outOfMapValidationMove(pawn, axis, value)
     if (getPawnAt(pawn.position).isDefined){
-      outOfMapValidationMove(pawn, axis, value)
+      if(outOfMapValidationMove(pawn, axis, value)) {
+        Gui.teamId -= 2
+        jumped = true
+        pawn.jumped = true
+      }
     }
     if (getPawnAt(pawn.position).isDefined){
       pawn.position = oldVector
+      if (jumped) {
+        Gui.teamId += 2
+        pawn.jumped = false
+      }
     }
   }
 }

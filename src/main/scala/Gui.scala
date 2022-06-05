@@ -3,7 +3,7 @@ import scalafx.application.{JFXApp3, Platform}
 import scalafx.scene.Scene
 import scalafx.scene.layout.GridPane
 import scalafx.scene.paint.Color
-import scalafx.scene.paint.Color.{Black, Blue, Red, White, Yellow}
+import scalafx.scene.paint.Color.{Black, Blue, Green, Red, White, Yellow}
 import scalafx.scene.shape.Rectangle
 
 object Gui extends JFXApp3{
@@ -14,12 +14,19 @@ object Gui extends JFXApp3{
   var grid: GridPane = new GridPane()
   var size: Int = 500
   var teamId: Int = -1
+  var someoneJumped: Boolean = false
 
   def notify_(): Unit = {
     Platform.runLater{
-      if(teamId == 3)
-        teamId = -5
+      if(teamId == 1)
+        teamId = -3
       teamId = teamId + 2
+      grid = paint()
+    }
+  }
+
+  def notify_nothing(): Unit = {
+    Platform.runLater{
       grid = paint()
     }
   }
@@ -42,13 +49,20 @@ object Gui extends JFXApp3{
         else
           grid.add(rect(size/8*i, size/8*j, White), j, i)
         if(board.getPawnAt(Vector(i, j)).isDefined) {
-          val pawn = board.getPawnAt(Vector(i, j)).getOrElse(Pawn(Vector(-1,-1),0))
+          val pawn = board.getPawnAt(Vector(i, j)).getOrElse(Pawn(Vector(-1,-1),0, jumped=false))
           val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16))
           pawn.id match{
             case 1 => circle.setFill(Blue)
             case -1 => circle.setFill(Yellow)
           }
-          if(pawn.id * teamId > 0) {
+          if(pawn.jumped) {
+            circle.setFill(Green)
+            someoneJumped = true
+            circle.setOnMouseClicked(_ => {
+            vector = Vector(i, j)
+            grid = paint()})
+          }
+          if(pawn.id * teamId > 0 && !someoneJumped) {
             circle.setOnMouseClicked(_ => {
               vector = Vector(i, j)
               grid = paint()
@@ -75,6 +89,7 @@ object Gui extends JFXApp3{
         content = grid
         onKeyPressed = (ke: KeyEvent) => {
           board.makePawnMove(vector, ke.getCode)
+          someoneJumped = false
           vector = Vector(-1, -1)
         }
       }
