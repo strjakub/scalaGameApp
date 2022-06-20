@@ -16,15 +16,12 @@ class Board(engine: Engine) {
   }
 
   def prepare2(): Unit = {
+    prepare1()
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(0, i), 1, jumped=false)
-      val pawn2 = Pawn(Vector(7, i), -1, jumped=false)
+      val pawn1 = Pawn(Vector(1, i), 1, jumped=false)
+      val pawn2 = Pawn(Vector(6, i), -1, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
-      val pawn3 = Pawn(Vector(1, i), 1, jumped=false)
-      val pawn4 = Pawn(Vector(6, i), -1, jumped=false)
-      board.put(pawn3.position, pawn3)
-      board.put(pawn4.position, pawn4)
     }
   }
 
@@ -68,17 +65,24 @@ class Board(engine: Engine) {
     }else{
       Gui.notify_nothing()
     }
-    board.put(pawn.position, pawn)
+    if (!pawn.finished){
+      board.put(pawn.position, pawn)
+    }
+    else {
+      engine.move()
+    }
   }
 
 
   def outOfMapValidationMove(pawn: Pawn, axis: Char, value: Int): Boolean ={
     axis match{
-      case 'x' => if (7 >= pawn.position.x + value && pawn.position.x + value >= 0){
-        pawn.position.x += value
-        pawn.jumped = false
-        return true
-      }
+      case 'x' =>
+        if (7 >= pawn.position.x + value && pawn.position.x + value >= 0){
+          pawn.position.x += value
+          pawn.jumped = false
+          return true
+        }
+        pawn.checkFinish(pawn.position.x+value)
       case 'y' => if (7 >= pawn.position.y + value && pawn.position.y + value >= 0){
         pawn.position.y += value
         pawn.jumped = false
