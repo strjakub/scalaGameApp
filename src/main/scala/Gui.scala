@@ -1,15 +1,17 @@
 import javafx.scene.input.KeyEvent
 import scalafx.application.{JFXApp3, Platform}
+import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Scene
-import scalafx.scene.layout.GridPane
+import scalafx.scene.control.Button
+import scalafx.scene.layout.{GridPane, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.paint.Color.{Black, Blue, Green, Red, White, Yellow}
 import scalafx.scene.shape.Rectangle
+import scalafx.scene.text.Font
 
 object Gui extends JFXApp3{
   val engine = new Engine()
   var board: Board = new Board(engine)
-  board.prepare()
   var vector: Vector = Vector(-1,-1)
   var grid: GridPane = new GridPane()
   var size: Int = 500
@@ -75,6 +77,28 @@ object Gui extends JFXApp3{
     grid
   }
 
+  def makeGame(): Unit = {
+    stage = new JFXApp3.PrimaryStage{
+      scene = new Scene(size, size){
+        paint()
+        content = grid
+        onKeyPressed = (ke: KeyEvent) => {
+          board.makePawnMove(vector, ke.getCode)
+          someoneJumped = false
+          vector = Vector(-1, -1)
+        }
+      }
+    }
+  }
+
+  def setButton(button: Button): Unit = {
+    button.setMinWidth(150)
+    button.setMaxWidth(150)
+    button.setMinHeight(50)
+    button.setMaxHeight(50)
+    button.setFont(new Font(20))
+  }
+
   override def start(): Unit = {
     size = size - size%8
     val thread = new Thread(engine)
@@ -83,15 +107,30 @@ object Gui extends JFXApp3{
       grid.addRow(i)
       grid.addColumn(i)
     }
-    grid = paint()
+    val firstMode = new Button("single row")
+    setButton(firstMode)
+    firstMode.setOnMouseClicked(_ => {
+      board.prepare1()
+      makeGame()
+    })
+    val secondMode = new Button("two rows")
+    setButton(secondMode)
+    secondMode.setOnMouseClicked(_ => {
+      board.prepare2()
+      makeGame()
+    })
+    val thirdMode = new Button("scattered")
+    setButton(thirdMode)
+    thirdMode.setOnMouseClicked(_ => {
+      board.prepare3()
+      makeGame()
+    })
+    val vBox = new VBox(10)
+    vBox.getChildren.addAll(firstMode, secondMode, thirdMode)
+    vBox.setPadding(new Insets(new javafx.geometry.Insets(150, 175, 150, 175)))
     stage = new JFXApp3.PrimaryStage{
       scene = new Scene(size, size){
-        content = grid
-        onKeyPressed = (ke: KeyEvent) => {
-          board.makePawnMove(vector, ke.getCode)
-          someoneJumped = false
-          vector = Vector(-1, -1)
-        }
+        content = vBox
       }
     }
   }

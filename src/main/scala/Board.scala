@@ -6,12 +6,40 @@ import scala.collection.mutable
 class Board(engine: Engine) {
   var board:mutable.HashMap[Vector, Pawn] = new mutable.HashMap()
 
-  def prepare(): Unit = {
+  def prepare1(): Unit = {
     for(i <- 0  to 7){
       val pawn1 = Pawn(Vector(0, i), 1, jumped=false)
       val pawn2 = Pawn(Vector(7, i), -1, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
+    }
+  }
+
+  def prepare2(): Unit = {
+    for(i <- 0  to 7){
+      val pawn1 = Pawn(Vector(0, i), 1, jumped=false)
+      val pawn2 = Pawn(Vector(7, i), -1, jumped=false)
+      board.put(pawn1.position, pawn1)
+      board.put(pawn2.position, pawn2)
+      val pawn3 = Pawn(Vector(1, i), 1, jumped=false)
+      val pawn4 = Pawn(Vector(6, i), -1, jumped=false)
+      board.put(pawn3.position, pawn3)
+      board.put(pawn4.position, pawn4)
+    }
+  }
+
+  def prepare3(): Unit = {
+    for(i <- 0  to 7){
+      for(j <- 0 to 7){
+        if(j < 3 && j%2 == i%2) {
+          val pawn1 = Pawn(Vector(j, i), 1, jumped = false)
+          board.put(pawn1.position, pawn1)
+        }
+        else if(j > 4 && j%2 == i%2) {
+          val pawn1 = Pawn(Vector(j, i), -1, jumped = false)
+          board.put(pawn1.position, pawn1)
+        }
+      }
     }
   }
 
