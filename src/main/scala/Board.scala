@@ -6,34 +6,34 @@ import scala.collection.mutable
 class Board(engine: Engine) {
   var board:mutable.HashMap[Vector, Pawn] = new mutable.HashMap()
 
-  def prepare1(): Unit = {
+  def prepare1(player1: Player, player2: Player): Unit = {
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(0, i), 1, jumped=false)
-      val pawn2 = Pawn(Vector(7, i), -1, jumped=false)
+      val pawn1 = Pawn(Vector(0, i), player1, jumped=false)
+      val pawn2 = Pawn(Vector(7, i), player2, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
   }
 
-  def prepare2(): Unit = {
-    prepare1()
+  def prepare2(player1: Player, player2: Player): Unit = {
+    prepare1(player1, player2)
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(1, i), 1, jumped=false)
-      val pawn2 = Pawn(Vector(6, i), -1, jumped=false)
+      val pawn1 = Pawn(Vector(1, i), player1, jumped=false)
+      val pawn2 = Pawn(Vector(6, i), player2, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
   }
 
-  def prepare3(): Unit = {
+  def prepare3(player1: Player, player2: Player): Unit = {
     for(i <- 0  to 7){
       for(j <- 0 to 7){
         if(j < 3 && j%2 == i%2) {
-          val pawn1 = Pawn(Vector(j, i), 1, jumped = false)
+          val pawn1 = Pawn(Vector(j, i), player1, jumped = false)
           board.put(pawn1.position, pawn1)
         }
         else if(j > 4 && j%2 == i%2) {
-          val pawn1 = Pawn(Vector(j, i), -1, jumped = false)
+          val pawn1 = Pawn(Vector(j, i), player2, jumped = false)
           board.put(pawn1.position, pawn1)
         }
       }
@@ -47,7 +47,7 @@ class Board(engine: Engine) {
   def makePawnMove(vector: Vector, command: KeyCode): Unit =  {
     val pawn : Pawn = board.remove(vector) match {
       case Some(value: Pawn) => value
-      case _ => Pawn(Vector(-1,-1), 0, jumped=false)
+      case _ => Pawn(Vector(-1,-1), Player("", 0, -1), jumped=false)
     }
     val memoryX = pawn.position.x
     val memoryY = pawn.position.y
@@ -69,6 +69,7 @@ class Board(engine: Engine) {
       board.put(pawn.position, pawn)
     }
     else {
+      pawn.player.numberOfPawns -= 1
       engine.move()
     }
   }
