@@ -1,3 +1,5 @@
+package Game
+
 import java.lang.Thread.sleep
 
 class Engine private extends Runnable{
@@ -19,11 +21,11 @@ class Engine private extends Runnable{
       while(!moveMade)
         sleep(100)
       moveMade = false
-      Gui.notify_()
+      Gui.Gui.notify_()
       if(player1.numberOfPawns == 0)
-        Gui.notify_endgame(player1)
+        Gui.Gui.notify_endgame(player1)
       if(player2.numberOfPawns == 0)
-        Gui.notify_endgame(player2)
+        Gui.Gui.notify_endgame(player2)
     }
   }
 }

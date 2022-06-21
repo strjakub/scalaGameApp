@@ -1,42 +1,11 @@
+package Game
+
 import javafx.scene.input.KeyCode
+
 import scala.collection.mutable
 
 class Board private (engine: Engine) {
   var board:mutable.HashMap[Vector, Pawn] = new mutable.HashMap()
-
-  def prepare1(player1: Player, player2: Player): Unit = {
-    for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(7, i), player1, jumped=false)
-      val pawn2 = Pawn(Vector(0, i), player2, jumped=false)
-      board.put(pawn1.position, pawn1)
-      board.put(pawn2.position, pawn2)
-    }
-  }
-
-  def prepare2(player1: Player, player2: Player): Unit = {
-    prepare1(player1, player2)
-    for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(6, i), player1, jumped=false)
-      val pawn2 = Pawn(Vector(1, i), player2, jumped=false)
-      board.put(pawn1.position, pawn1)
-      board.put(pawn2.position, pawn2)
-    }
-  }
-
-  def prepare3(player1: Player, player2: Player): Unit = {
-    for(i <- 0  to 7){
-      for(j <- 0 to 7){
-        if(j > 4 && j%2 == i%2) {
-          val pawn1 = Pawn(Vector(j, i), player1, jumped = false)
-          board.put(pawn1.position, pawn1)
-        }
-        else if(j < 3 && j%2 == i%2) {
-          val pawn1 = Pawn(Vector(j, i), player2, jumped = false)
-          board.put(pawn1.position, pawn1)
-        }
-      }
-    }
-  }
 
   def getPawnAt(vector: Vector): Option[Pawn] ={
     board.get(vector)
@@ -58,10 +27,10 @@ class Board private (engine: Engine) {
       case _ =>
     }
 
-    if(memoryX != pawn.position.x || memoryY != pawn.position.y) {
+    if((memoryX != pawn.position.x || memoryY != pawn.position.y) && pawn.player.id != 0) {
       engine.move()
     }else{
-      Gui.notify_nothing()
+      Gui.Gui.notify_nothing()
     }
     if (!pawn.finished){
       board.put(pawn.position, pawn)
@@ -95,10 +64,11 @@ class Board private (engine: Engine) {
   def checkJumps(pawn: Pawn, axis: Char, value: Int): Unit ={
     val oldVector = Vector(pawn.position.x, pawn.position.y)
     var jumped = false
+    val alreadyHasExtraTurn = pawn.jumped
     outOfMapValidationMove(pawn, axis, value)
     if (getPawnAt(pawn.position).isDefined){
       if(outOfMapValidationMove(pawn, axis, value)) {
-        Gui.teamId -= 2
+        Gui.Gui.teamId -= 2
         jumped = true
         pawn.jumped = true
       }
@@ -106,8 +76,8 @@ class Board private (engine: Engine) {
     if (getPawnAt(pawn.position).isDefined){
       pawn.position = oldVector
       if (jumped) {
-        Gui.teamId += 2
-        pawn.jumped = false
+        Gui.Gui.teamId += 2
+        pawn.jumped = alreadyHasExtraTurn
       }
     }
   }
