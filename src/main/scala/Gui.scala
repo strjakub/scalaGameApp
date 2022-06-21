@@ -5,27 +5,21 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, TextField}
 import scalafx.scene.layout.{GridPane, VBox}
 import scalafx.scene.paint.Color
-import scalafx.scene.paint.Color.{Black, Blue, Green, Red, White, Yellow}
+import scalafx.scene.paint.Color.{Black, Blue, Green, Orange, Red, White}
 import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.Font
 
 object Gui extends JFXApp3{
-  val engine = new Engine()
-  var board: Board = new Board(engine)
+  val engine: Engine = Engine()
+  var board: Board = Board(engine)
   var vector: Vector = Vector(-1,-1)
   var grid: GridPane = new GridPane()
   var size: Int = 500
   var teamId: Int = -1
   var someoneJumped: Boolean = false
-  var player1:Player = Player("", 0, -100)
-  var player2:Player = Player("", 0, -100)
-
 
   def notify_(): Unit = {
     Platform.runLater{
-      if(player1.numberOfPawns == 0){
-        endGame(player1)
-      }
       if(teamId == 1)
         teamId = -3
       teamId = teamId + 2
@@ -36,6 +30,12 @@ object Gui extends JFXApp3{
   def notify_nothing(): Unit = {
     Platform.runLater{
       grid = paint()
+    }
+  }
+
+  def notify_endgame(player: Player): Unit = {
+    Platform.runLater{
+      endGame(player)
     }
   }
 
@@ -61,7 +61,7 @@ object Gui extends JFXApp3{
           val circle = new scalafx.scene.shape.Circle(new javafx.scene.shape.Circle(size/8*i+size/16, size/8*j+size/16, size/16))
           pawn.player.id match{
             case 1 => circle.setFill(Blue)
-            case -1 => circle.setFill(Yellow)
+            case -1 => circle.setFill(Orange)
           }
           if(pawn.jumped) {
             circle.setFill(Green)
@@ -120,38 +120,31 @@ object Gui extends JFXApp3{
     val firstMode = new Button("single row")
     setButton(firstMode)
     firstMode.setOnMouseClicked(_ => {
-      player1 = Player(textField1.getText(), 1, 8)
-      player2 = Player(textField2.getText(), -1, 8)
-      board.prepare1(player1, player2)
+      engine.setPlayers(textField1.getText(), textField2.getText(), 8)
+      board.prepare1(engine.player1, engine.player2)
       makeGame()
     })
     val secondMode = new Button("two rows")
     setButton(secondMode)
     secondMode.setOnMouseClicked(_ => {
-      player1 = Player(textField1.getText(), 1, 16)
-      player2 = Player(textField2.getText(), -1, 16)
-      board.prepare2(player1, player2)
+      engine.setPlayers(textField1.getText(), textField2.getText(), 16)
+      board.prepare2(engine.player1, engine.player2)
       makeGame()
     })
     val thirdMode = new Button("scattered")
     setButton(thirdMode)
     thirdMode.setOnMouseClicked(_ => {
-      player1 = Player(textField1.getText(), 1, 12)
-      player2 = Player(textField2.getText(), -1, 12)
-      board.prepare3(player1, player2)
+      engine.setPlayers(textField1.getText(), textField2.getText(), 12)
+      board.prepare3(engine.player1, engine.player2)
       makeGame()
     })
     val vBox = new VBox(10)
     vBox.getChildren.addAll(label1, textField1, label2, textField2, firstMode, secondMode, thirdMode)
-    vBox.setPadding(new Insets(new javafx.geometry.Insets(150, 175, 150, 175)))
-    stage = new JFXApp3.PrimaryStage{
-      scene = new Scene(size, size){
-        content = vBox
-      }
-    }
+    vBox.setPadding(new Insets(new javafx.geometry.Insets(100, 175, 100, 175)))
+    setStageBox(vBox)
   }
 
-  def endGame(player: Player){
+  def endGame(player: Player): Unit = {
     val winnerLabel = new Label(player.name + " won!")
     val restartButton = new Button("Restart")
     setButton(restartButton)
@@ -160,7 +153,11 @@ object Gui extends JFXApp3{
     })
     val box = new VBox(10)
     box.getChildren.addAll(winnerLabel, restartButton)
-    box.setPadding(new Insets(new javafx.geometry.Insets(150, 175, 150, 175)))
+    box.setPadding(new Insets(new javafx.geometry.Insets(175, 175, 175, 175)))
+    setStageBox(box)
+  }
+
+  def setStageBox(box: VBox): Unit = {
     stage = new JFXApp3.PrimaryStage{
       scene = new Scene(size, size){
         content = box
@@ -168,5 +165,3 @@ object Gui extends JFXApp3{
     }
   }
 }
-
-

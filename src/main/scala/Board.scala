@@ -1,15 +1,13 @@
 import javafx.scene.input.KeyCode
-
 import scala.collection.mutable
 
-
-class Board(engine: Engine) {
+class Board private (engine: Engine) {
   var board:mutable.HashMap[Vector, Pawn] = new mutable.HashMap()
 
   def prepare1(player1: Player, player2: Player): Unit = {
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(0, i), player1, jumped=false)
-      val pawn2 = Pawn(Vector(7, i), player2, jumped=false)
+      val pawn1 = Pawn(Vector(7, i), player1, jumped=false)
+      val pawn2 = Pawn(Vector(0, i), player2, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
@@ -18,8 +16,8 @@ class Board(engine: Engine) {
   def prepare2(player1: Player, player2: Player): Unit = {
     prepare1(player1, player2)
     for(i <- 0  to 7){
-      val pawn1 = Pawn(Vector(1, i), player1, jumped=false)
-      val pawn2 = Pawn(Vector(6, i), player2, jumped=false)
+      val pawn1 = Pawn(Vector(6, i), player1, jumped=false)
+      val pawn2 = Pawn(Vector(1, i), player2, jumped=false)
       board.put(pawn1.position, pawn1)
       board.put(pawn2.position, pawn2)
     }
@@ -28,11 +26,11 @@ class Board(engine: Engine) {
   def prepare3(player1: Player, player2: Player): Unit = {
     for(i <- 0  to 7){
       for(j <- 0 to 7){
-        if(j < 3 && j%2 == i%2) {
+        if(j > 4 && j%2 == i%2) {
           val pawn1 = Pawn(Vector(j, i), player1, jumped = false)
           board.put(pawn1.position, pawn1)
         }
-        else if(j > 4 && j%2 == i%2) {
+        else if(j < 3 && j%2 == i%2) {
           val pawn1 = Pawn(Vector(j, i), player2, jumped = false)
           board.put(pawn1.position, pawn1)
         }
@@ -84,10 +82,11 @@ class Board(engine: Engine) {
           return true
         }
         pawn.checkFinish(pawn.position.x+value)
-      case 'y' => if (7 >= pawn.position.y + value && pawn.position.y + value >= 0){
-        pawn.position.y += value
-        pawn.jumped = false
-        return true
+      case 'y' =>
+        if (7 >= pawn.position.y + value && pawn.position.y + value >= 0){
+          pawn.position.y += value
+          pawn.jumped = false
+          return true
       }
     }
     false
@@ -112,4 +111,8 @@ class Board(engine: Engine) {
       }
     }
   }
+}
+
+object Board {
+  def apply(engine: Engine): Board = new Board(engine)
 }
