@@ -5,7 +5,7 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.Label
 import scalafx.scene.layout.VBox
 
-class EndingWindow {
+object EndingWindow {
   def createBox(player: Player): VBox ={
 
     val winnerLabel = new Label(player.name + " won!")
@@ -19,9 +19,5 @@ class EndingWindow {
     box.getChildren.addAll(winnerLabel, restartButton)
     box
   }
-}
-
-object EndingWindow {
-  def apply(): EndingWindow = new EndingWindow()
 }
 

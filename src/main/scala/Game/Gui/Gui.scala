@@ -14,7 +14,7 @@ object Gui extends JFXApp3 {
   var board: Board = Board(engine)
   var vector: Vector = Vector(-1, -1)
   var grid: GridPane = new GridPane()
-  var size: Int = 500
+  var size: Int = 496
   var teamId: Int = -1
   var someoneJumped: Boolean = false
   val buttonFactory: ButtonFactory = ButtonFactory()
@@ -37,7 +37,8 @@ object Gui extends JFXApp3 {
 
   def notify_endgame(player: Player): Unit = {
     Platform.runLater {
-      setStageBox(EndingWindow().createBox(player))
+      setStageBox(EndingWindow.createBox(player))
+      board.board.clear()
     }
   }
 
@@ -92,17 +93,13 @@ object Gui extends JFXApp3 {
     }
   }
 
-
   override def start(): Unit = {
-    size = size - size % 8
-
     val thread = new Thread(engine)
     thread.start()
 
     prepareGrid()
-    setStageBox(StartingWindow().createBox())
+    setStageBox(StartingWindow.createBox())
   }
-
 
   def setStageBox(box: VBox): Unit = {
     stage = new JFXApp3.PrimaryStage {

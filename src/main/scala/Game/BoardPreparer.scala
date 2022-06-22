@@ -35,6 +35,13 @@ class BoardPreparer(board: Board) {
       }
     }
   }
+
+  def prepare1v1(player1: Player, player2: Player): Unit = {
+    val pawn1 = Pawn(Vector(0, 3), player2, jumped = false)
+    board.board.put(pawn1.position, pawn1)
+    val pawn2 = Pawn(Vector(7, 4), player1, jumped = false)
+    board.board.put(pawn2.position, pawn2)
+  }
 }
 
 object BoardPreparer {

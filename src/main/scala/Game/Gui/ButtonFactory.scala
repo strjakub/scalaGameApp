@@ -10,7 +10,8 @@ class ButtonFactory() {
     gameType match {
       case OneRow => button = new Button("Single row")
       case TwoRows => button = new Button("Two rows")
-      case ScatteredRows => button = new Button("Scattered")
+      case Scattered => button = new Button("Scattered")
+      case OneVOne => button = new Button("1 v 1")
     }
     setButtonSize(button)
     button

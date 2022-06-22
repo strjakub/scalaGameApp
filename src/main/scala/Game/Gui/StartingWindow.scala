@@ -6,7 +6,7 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.{Label, TextField}
 import scalafx.scene.layout.VBox
 
-class StartingWindow {
+object StartingWindow {
   def createBox(): VBox ={
     val label1 = new Label("First player name:")
     val label2 = new Label("Second player name:")
@@ -16,7 +16,8 @@ class StartingWindow {
 
     val firstMode = buttonFactory.createModeButton(OneRow)
     val secondMode = buttonFactory.createModeButton(TwoRows)
-    val thirdMode = buttonFactory.createModeButton(ScatteredRows)
+    val thirdMode = buttonFactory.createModeButton(Scattered)
+    val fourthMode = buttonFactory.createModeButton(OneVOne)
 
     firstMode.setOnMouseClicked(_ => {
       engine.setPlayers(textField1.getText(), textField2.getText(), 8)
@@ -33,14 +34,16 @@ class StartingWindow {
       boardPreparer.prepareScatteredRows(engine.player1, engine.player2)
       Gui.makeGame()
     })
+    fourthMode.setOnMouseClicked(_ => {
+      engine.setPlayers(textField1.getText(), textField2.getText(), 1)
+      boardPreparer.prepare1v1(engine.player1, engine.player2)
+      Gui.makeGame()
+    })
 
     val vBox = new VBox(10)
-    vBox.getChildren.addAll(label1, textField1, label2, textField2, firstMode, secondMode, thirdMode)
+    vBox.getChildren.addAll(label1, textField1, label2, textField2, firstMode, secondMode, thirdMode, fourthMode)
     vBox.setPadding(new Insets(new javafx.geometry.Insets(100, 175, 100, 175)))
     vBox
   }
 }
 
-object StartingWindow {
-  def apply(): StartingWindow = new StartingWindow()
-}
